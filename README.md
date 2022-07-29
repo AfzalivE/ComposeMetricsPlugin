@@ -1,4 +1,4 @@
-# Kotlin Warning Baseline Gradle Plugin
+# Compose Metrics Gradle Plugin
 
 This plugin adds tasks to control kotlin warnings in the project with the help of baseline or without it. Typical usage of the plugin would be checking that PR doesn't introduce new warnings (for example [github action](.github/workflows/warning-check.yml)) or running it locally to catch new deprecations after dependencies update.
 
@@ -8,13 +8,13 @@ Currently, plugin supports: Kotlin JVM, Kotlin Multiplatform and Android project
 
 Run:
 ```shell
-./gradlew checkKotlinWarningBaseline
+./gradlew checkComposeMetricsBaseline
 ```
 and receive error in case of new warnings:
 ```
 FAILURE: Build failed with an exception.
 * What went wrong:
-Execution failed for task ':checkKotlinWarningBaseline'.
+Execution failed for task ':checkComposeMetricsBaseline'.
 > Found 3 warnings behind baseline:
   .../src/main/kotlin/com/doist/gradle/KotlinWarningBaselinePlugin.kt: (3, 30): 'TaskInGraphSpec' is deprecated. 
   .../src/main/kotlin/com/doist/gradle/KotlinWarningBaselinePlugin.kt: (69, 72): 'TaskInGraphSpec' is deprecated. 
@@ -30,7 +30,7 @@ Execution failed for task ':checkKotlinWarningBaseline'.
 
 ```kotlin
 plugins {
-    id("com.doist.gradle.kotlin-warning-baseline") version "1.0.0"
+    id("com.doist.gradle.compose-metrics") version "1.0.0"
 }
 
 // Optional configuration.

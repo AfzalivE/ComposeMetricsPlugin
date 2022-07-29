@@ -1,1 +1,1 @@
-rootProject.name = "kotlin-warning-baseline"
+rootProject.name = "compose-metrics"

@@ -17,13 +17,13 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompile
 import java.io.File
 
-class KotlinWarningBaselinePlugin : Plugin<Project> {
+class OldComposeMetricsPlugin : Plugin<Project> {
     override fun apply(target: Project) = with(target) {
-        val extension = extensions.create<KotlinWarningBaselineExtension>("kotlinWarningBaseline")
+        val extension = extensions.create<ComposeMetricsExtension>("composeMetricsPlugin")
         afterEvaluate { configure(extension) }
     }
 
-    private fun Project.configure(extension: KotlinWarningBaselineExtension) {
+    private fun Project.configure(extension: ComposeMetricsExtension) {
         val kotlinExtension = extensions.findByType<KotlinProjectExtension>()
             ?: throw GradleException("Kotlin not configured in project $this.")
         val baselines = kotlinExtension.sourceSets.associate {
@@ -34,7 +34,7 @@ class KotlinWarningBaselinePlugin : Plugin<Project> {
 
         val kotlinTaskMap = tasks.withType<AbstractKotlinCompile<*>>()
             .filter { task -> extension.skipSpecs.none { it.isSatisfiedBy(task) } }
-            .associateWith { File(buildDir, "kotlin-warnings/${it.name}.txt") }
+            .associateWith { File(buildDir, "compose-metrics/${it.name}.txt") }
             .onEach { (task, file) ->
                 val collector = WarningFileCollector(task, file, pathConvertor, baselines.keys)
                 gradle.taskGraph.addTaskExecutionListener(collector)
@@ -42,7 +42,7 @@ class KotlinWarningBaselinePlugin : Plugin<Project> {
 
         val clean = tasks.getByName("clean")
 
-        val check = tasks.create<CheckKotlinWarningBaselineTask>("checkKotlinWarningBaseline") {
+        val check = tasks.create<CheckKotlinWarningBaselineTask>("checkComposeMetrics") {
             group = "verification"
             description = "Check that all warnings are in warning baseline files."
 
@@ -53,7 +53,7 @@ class KotlinWarningBaselinePlugin : Plugin<Project> {
             dependsOn(kotlinTaskMap.keys + clean)
             mustRunAfter(clean)
         }
-        val write = tasks.create<WriteKotlinWarningBaselineTask>("writeKotlinWarningBaseline") {
+        val write = tasks.create<WriteKotlinWarningBaselineTask>("writeComposeMetricsBaseline") {
             group = "verification"
             description = "Create or update warning baseline files for each source set."
 
@@ -64,7 +64,7 @@ class KotlinWarningBaselinePlugin : Plugin<Project> {
             dependsOn(kotlinTaskMap.keys + clean)
             mustRunAfter(clean)
         }
-        tasks.create<RemoveKotlinWarningBaselineTask>("removeKotlinWarningBaseline") {
+        tasks.create<RemoveKotlinWarningBaselineTask>("removeComposeMetricsBaseline") {
             group = "verification"
             description = "Remove all warning baseline files."
 
@@ -89,7 +89,7 @@ class KotlinWarningBaselinePlugin : Plugin<Project> {
         )
     }
 
-    private val KotlinWarningBaselineExtension.warningPostfix
+    private val ComposeMetricsExtension.warningPostfix
         get() = when {
             insertFinalNewline -> "\n"
             else -> ""
